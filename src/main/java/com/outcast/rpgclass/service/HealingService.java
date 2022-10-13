@@ -27,8 +27,8 @@ public class HealingService {
         }.runTaskTimer(RPGClass.getInstance(), 0, config.HEALTH_REGEN_DURATION_TICKS);
     }
 
-    public void heal(LivingEntity entity, double amount) {
-        entity.setHealth(Math.min(entity.getHealth() + amount, entity.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
+    public void heal(LivingEntity living, double amount) {
+        living.setHealth(Math.min(living.getHealth() + amount, living.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue()));
     }
 
     private void tickHealthRegen() {

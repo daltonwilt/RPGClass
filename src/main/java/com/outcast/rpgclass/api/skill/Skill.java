@@ -42,20 +42,20 @@ public abstract class Skill implements Castable {
         return RPGClass.getInstance().getExpressionService().getExpression(expression);
     }
 
-    protected static double asDouble(LivingEntity source, String exp) {
-        return RPGClass.getInstance().getExpressionService().evalExpression(source, exp).doubleValue();
+    protected static double asDouble(LivingEntity living, String exp) {
+        return RPGClass.getInstance().getExpressionService().evalExpression(living, exp).doubleValue();
     }
 
-    protected static double asDouble(LivingEntity source, LivingEntity target, String exp) {
-        return RPGClass.getInstance().getExpressionService().evalExpression(source, target, exp).doubleValue();
+    protected static double asDouble(LivingEntity living, LivingEntity target, String exp) {
+        return RPGClass.getInstance().getExpressionService().evalExpression(living, target, exp).doubleValue();
     }
 
-    protected static int asInt(LivingEntity source, String exp) {
-        return RPGClass.getInstance().getExpressionService().evalExpression(source, exp).intValue();
+    protected static int asInt(LivingEntity living, String exp) {
+        return RPGClass.getInstance().getExpressionService().evalExpression(living, exp).intValue();
     }
 
-    protected static int asInt(LivingEntity source, LivingEntity target, String exp) {
-        return RPGClass.getInstance().getExpressionService().evalExpression(source, target, exp).intValue();
+    protected static int asInt(LivingEntity living, LivingEntity target, String exp) {
+        return RPGClass.getInstance().getExpressionService().evalExpression(living, target, exp).intValue();
     }
 
     //===========================================================================================================

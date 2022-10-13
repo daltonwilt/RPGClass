@@ -17,8 +17,8 @@ public abstract class TargetedSkill extends Skill implements TargetedCastable {
     }
 
     @Override
-    public double getRange(LivingEntity entity) {
-        return asDouble(entity, getProperty(MAX_RANGE_PROPERTY, String.class, "100.0"));
+    public double getRange(LivingEntity living) {
+        return asDouble(living, getProperty(MAX_RANGE_PROPERTY, String.class, "100.0"));
     }
 
 }

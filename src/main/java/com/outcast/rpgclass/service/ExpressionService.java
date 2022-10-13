@@ -75,22 +75,22 @@ public class ExpressionService {
         ));
     }
 
-    public BigDecimal evalExpression(LivingEntity source, String stringExpression) {
-        return evalExpression(source, getExpression(stringExpression));
+    public BigDecimal evalExpression(LivingEntity living, String stringExpression) {
+        return evalExpression(living, getExpression(stringExpression));
     }
 
-    public BigDecimal evalExpression(LivingEntity source, LivingEntity target, String stringExpression) {
-        return evalExpression(source, target, getExpression(stringExpression));
+    public BigDecimal evalExpression(LivingEntity living, LivingEntity target, String stringExpression) {
+        return evalExpression(living, target, getExpression(stringExpression));
     }
 
-    public BigDecimal evalExpression(LivingEntity source, Expression expression) {
-        populateSourceAttributes(expression, attributeService.getAllAttributes(source));
+    public BigDecimal evalExpression(LivingEntity living, Expression expression) {
+        populateSourceAttributes(expression, attributeService.getAllAttributes(living));
 
         return expression.eval(true);
     }
 
-    public BigDecimal evalExpression(LivingEntity source, LivingEntity target, Expression expression) {
-        populateSourceAttributes(expression, attributeService.getAllAttributes(source));
+    public BigDecimal evalExpression(LivingEntity living, LivingEntity target, Expression expression) {
+        populateSourceAttributes(expression, attributeService.getAllAttributes(living));
         populateTargetAttributes(expression, attributeService.getAllAttributes(target));
 
         return expression.eval(true);

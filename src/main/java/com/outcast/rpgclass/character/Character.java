@@ -11,10 +11,11 @@ import java.util.*;
 //===========================================================================================================
 // Class that stores data for a player with Getters/Setters to manipulate or use data in other resources
 //===========================================================================================================
+
 public class Character implements RPGCharacter<Player> {
 
     private UUID id;
-    private Player entity;
+    private Player player;
     private boolean hasJoined;
 
     /**
@@ -22,6 +23,7 @@ public class Character implements RPGCharacter<Player> {
      * from the configuration
      * Only Upgradable Attributes should be stored within this map
      */
+
     private Map<AttributeType, Double> characterAttributes = new HashMap<>();
 
     /**
@@ -39,7 +41,7 @@ public class Character implements RPGCharacter<Player> {
     /**
      * List of skills acquired by player
      */
-    private List<Skill> skills;
+    private List<Skill> skills = new ArrayList<>();
     private Role role = Role.adventurer;
 
     public Character() {}
@@ -54,12 +56,12 @@ public class Character implements RPGCharacter<Player> {
     }
 
     @Override
-    public Optional<Player> getEntity() {
-        return Optional.ofNullable(entity);
+    public Optional<Player> getLivingEntity() {
+        return Optional.ofNullable(player);
     }
 
-    public void setEntity(Player player) {
-        this.entity = player;
+    public void setLivingEntity(Player player) {
+        this.player = player;
     }
 
     public boolean isHasJoined() {

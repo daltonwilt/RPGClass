@@ -65,10 +65,10 @@ public class MobService {
 //        return Optional.ofNullable(mobsCache.get(id));
 //    }
 
-    public void assignEntityDamageExpression(LivingEntity entity, Map<AttributeType, Double> mobAttributes, String damageExpression) {
+    public void assignEntityDamageExpression(LivingEntity living, Map<AttributeType, Double> mobAttributes, String damageExpression) {
         Map<AttributeType, Double> attributes = attributeService.fillInAttributes(mobAttributes);
 //
-        characterService.getOrCreateCharacter(entity, attributes);
+        characterService.getOrCreateCharacter(living, attributes);
 //        entity.offer(new DamageExpressionData(damageExpression));
     }
 

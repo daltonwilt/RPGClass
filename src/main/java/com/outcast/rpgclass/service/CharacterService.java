@@ -146,7 +146,7 @@ public class CharacterService {
     }
 
     private Optional<Player> getPlayer(Character character) {
-        return character.getEntity();
+        return character.getLivingEntity();
     }
 
     // Add level & experience method additions
@@ -279,9 +279,9 @@ public class CharacterService {
         resetCharacterAttributes(character);
     }
 
-    public void assignEntityResourceLimit(LivingEntity player, boolean fill) {
-        double max = expressionService.evalExpression(player, config.RESOURCE_LIMIT_CALCULATION).doubleValue();
-        ResourceEntity user = RPGSkill.getInstance().getResourceService().getOrCreateEntity(player);
+    public void assignEntityResourceLimit(LivingEntity living, boolean fill) {
+        double max = expressionService.evalExpression(living, config.RESOURCE_LIMIT_CALCULATION).doubleValue();
+        ResourceEntity user = RPGSkill.getInstance().getResourceService().getOrCreateEntity(living);
 
         user.setMax(max);
         if (fill) {

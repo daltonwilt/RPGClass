@@ -13,9 +13,9 @@ import java.util.Optional;
 //===========================================================================================================
 public interface RPGCharacter<T extends LivingEntity> extends Identifiable {
 
-    Optional<T> getEntity();
+    Optional<T> getLivingEntity();
 
-    void setEntity(T entity);
+    void setLivingEntity(T living);
 
     /**
      * Gets the current Character Attributes

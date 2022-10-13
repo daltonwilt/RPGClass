@@ -51,11 +51,11 @@ public class SkillFacade {
         if (!event.getResult().getMessage().equals(Component.empty().toString())) {
             message = Component.text(event.getResult().getMessage());
         } else {
-            String name = event.getEntity().getName();
+            String name = event.getLivingEntity().getName();
             message = rpgMsg.formatInfo(ChatColor.DARK_AQUA + name + ChatColor.DARK_GRAY + " cast " + ChatColor.DARK_RED + event.getSkill().getName());
         }
 
-        event.getEntity().getNearbyEntities(config.SKILL_MESSAGE_DISTANCE, config.SKILL_MESSAGE_DISTANCE, config.SKILL_MESSAGE_DISTANCE).forEach(entity -> {
+        event.getLivingEntity().getNearbyEntities(config.SKILL_MESSAGE_DISTANCE, config.SKILL_MESSAGE_DISTANCE, config.SKILL_MESSAGE_DISTANCE).forEach(entity -> {
             if (entity instanceof Player) {
                 ((Audience)entity).sendMessage(message);
             }
