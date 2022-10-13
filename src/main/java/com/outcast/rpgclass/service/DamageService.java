@@ -1,0 +1,106 @@
+package com.outcast.rpgclass.service;
+
+import com.google.inject.Inject;
+import com.outcast.rpgclass.api.stat.AttributeType;
+import com.outcast.rpgclass.config.RPGClassConfig;
+import com.udojava.evalex.Expression;
+import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
+
+import java.math.BigDecimal;
+import java.util.Map;
+
+public class DamageService {
+
+    private static final String INCOMING = "INCOMING";
+
+    @Inject
+    private RPGClassConfig config;
+
+    @Inject
+    private ExpressionService expressionService;
+
+    public DamageService() {
+    }
+
+    public double getMeleeDamage(Map<AttributeType, Double> attackerAttributes, Map<AttributeType, Double> targetAttributes, Material weaponType) {
+        String damageType = getMeleeDamageType(weaponType);
+
+        // Calculate and return the damage
+        return calcDamage(attackerAttributes, targetAttributes, damageType);
+    }
+
+    public double getRangedDamage(Map<AttributeType, Double> attackerAttributes, Map<AttributeType, Double> targetAttributes, EntityType projectileType, double speed) {
+        String damageType = getRangedDamageType(projectileType);
+
+        // Calculate and return the damage
+        return calcRangedDamage(attackerAttributes, targetAttributes, damageType, speed);
+    }
+
+    public double calcRangedDamage(Map<AttributeType, Double> attackerAttributes, Map<AttributeType, Double> targetAttributes, String type, double speed) {
+        Expression producedDamageExpression = expressionService.getExpression(config.DAMAGE_CALCULATIONS.get(type));
+        producedDamageExpression.setVariable("SPEED", BigDecimal.valueOf(speed));
+        expressionService.populateSourceAttributes(producedDamageExpression, attackerAttributes);
+        expressionService.populateTargetAttributes(producedDamageExpression, targetAttributes);
+        double producedDamage = producedDamageExpression.eval().doubleValue();
+
+        return getPhysicalDamageMitigation(targetAttributes, producedDamage);
+    }
+
+    public double calcDamage(Map<AttributeType, Double> attackerAttributes, Map<AttributeType, Double> targetAttributes, String type) {
+        Expression producedDamageExpression = expressionService.getExpression(config.DAMAGE_CALCULATIONS.get(type));
+        expressionService.populateSourceAttributes(producedDamageExpression, attackerAttributes);
+        double producedDamage = producedDamageExpression.eval().doubleValue();
+
+        return getPhysicalDamageMitigation(targetAttributes, producedDamage);
+    }
+
+    public double getPhysicalDamageMitigation(Map<AttributeType, Double> targetAttributes, double producedDamage) {
+        Expression mitigatedDamageExpression = expressionService.getExpression(config.PHYSICAL_DAMAGE_MITIGATION_CALCULATION);
+        expressionService.populateTargetAttributes(mitigatedDamageExpression, targetAttributes);
+
+        return mitigatedDamageExpression.setVariable(INCOMING, new BigDecimal(producedDamage)).eval().doubleValue();
+    }
+
+    public double getMagicalDamageMitigation(Map<AttributeType, Double> targetAttributes, double producedDamage) {
+        Expression mitigatedDamageExpression = expressionService.getExpression(config.MAGICAL_DAMAGE_MITIGATION_CALCULATION);
+        expressionService.populateTargetAttributes(mitigatedDamageExpression, targetAttributes);
+
+        return mitigatedDamageExpression.setVariable(INCOMING, new BigDecimal(producedDamage)).eval().doubleValue();
+    }
+
+    public double getDamageFromExpression(Map<AttributeType, Double> attackerAttributes, Map<AttributeType, Double> targetAttributes, String damageExpression) {
+        return getDamageFromExpression(attackerAttributes, targetAttributes, damageExpression, null);
+    }
+
+    public double getDamageFromExpression(Map<AttributeType, Double> attackerAttributes, Map<AttributeType, Double> targetAttributes, String damageExpression, Map<String, BigDecimal> extraAttributes) {
+        Expression customExpression = expressionService.getExpression(damageExpression);
+
+        if (extraAttributes != null) {
+            extraAttributes.forEach(customExpression::setVariable);
+        }
+
+        expressionService.populateSourceAttributes(customExpression, attackerAttributes);
+        expressionService.populateTargetAttributes(customExpression, targetAttributes);
+
+        return customExpression.eval().doubleValue();
+    }
+
+    public String getMeleeDamageExpression(Material material) {
+        String type = getMeleeDamageType(material);
+        return config.DAMAGE_CALCULATIONS.get(type);
+    }
+
+    private String getMeleeDamageType(Material material) {
+        return config.ITEM_DAMAGE_TYPES.getOrDefault(material, config.DEFAULT_MELEE_TYPE);
+    }
+
+    public String getRangedDamageExpression(EntityType projectileType) {
+        String type = getRangedDamageType(projectileType);
+        return config.DAMAGE_CALCULATIONS.get(type);
+    }
+
+    private String getRangedDamageType(EntityType projectileType) {
+        return config.PROJECTILE_DAMAGE_TYPES.getOrDefault(projectileType, config.DEFAULT_RANGED_TYPE);
+    }
+}
