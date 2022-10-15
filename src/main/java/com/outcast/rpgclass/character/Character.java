@@ -10,6 +10,8 @@ import java.util.*;
 
 //===========================================================================================================
 // Class that stores data for a player with Getters/Setters to manipulate or use data in other resources
+//
+// Store data in mongodb documents
 //===========================================================================================================
 
 public class Character implements RPGCharacter<Player> {

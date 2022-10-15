@@ -7,6 +7,7 @@ import java.util.Objects;
 //===========================================================================================================
 // Object that creates that stores data for different attribute types
 //===========================================================================================================
+
 public class AttributeType {
 
     private final String id;

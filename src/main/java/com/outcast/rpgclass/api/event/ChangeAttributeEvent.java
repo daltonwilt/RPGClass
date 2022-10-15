@@ -8,6 +8,7 @@ import org.bukkit.event.HandlerList;
 //===========================================================================================================
 // Event for triggering when an attribute has been updated
 //===========================================================================================================
+
 public class ChangeAttributeEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();

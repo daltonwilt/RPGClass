@@ -24,7 +24,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class RPGClass extends JavaPlugin {
 
     private static RPGClass instance;
-
     private static Components components;
 
     @Inject

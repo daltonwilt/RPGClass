@@ -8,6 +8,7 @@ import java.util.Set;
 //===========================================================================================================
 // Object that stores data for a specific class
 //===========================================================================================================
+
 public class Role {
 
     public static final Role adventurer = new Role("Adventurer", Collections.emptySet(), "You have not acquired any skills.");

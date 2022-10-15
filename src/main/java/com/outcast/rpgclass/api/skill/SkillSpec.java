@@ -8,6 +8,7 @@ import java.util.Map;
 //===========================================================================================================
 // Class that will be called when creating skill information inside a custom skill
 //===========================================================================================================
+
 public class SkillSpec {
 
     private String id;
@@ -59,7 +60,7 @@ public class SkillSpec {
 
     public SkillSpec id(String id) {
         this.id = id;
-        permission = "atherysrpg.rpgskills." + id;
+        permission = "rpgclass.rpgskills." + id;
         return this;
     }
 

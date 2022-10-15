@@ -7,6 +7,7 @@ import org.bukkit.entity.LivingEntity;
 //===========================================================================================================
 // Placeholder skill if a skill isn't found
 //===========================================================================================================
+
 public final class BlankSkill extends Skill {
 
     public static final BlankSkill blank = new BlankSkill();

@@ -18,6 +18,7 @@ import static com.outcast.rpgcore.util.InventoryUtil.*;
 //===========================================================================================================
 // Implement this system after mob integration is finished.
 //===========================================================================================================
+
 public class AttributeService {
 
     private Map<AttributeType, Double> defaultAttributes;

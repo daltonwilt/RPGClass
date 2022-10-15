@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 //===========================================================================================================
 // Facade class that usable methods by entities for skills and their characters
 //===========================================================================================================
+
 @Singleton
 public class CharacterFacade {
 

@@ -7,6 +7,7 @@ import com.outcast.rpgclass.api.character.RPGCharacter;
 import com.outcast.rpgclass.api.event.ChangeAttributeEvent;
 import com.outcast.rpgclass.api.skill.Skill;
 import com.outcast.rpgclass.api.stat.AttributeType;
+import com.outcast.rpgclass.character.BaseCharacter;
 import com.outcast.rpgclass.character.Role;
 import com.outcast.rpgclass.character.Character;
 import com.outcast.rpgclass.config.RPGClassConfig;
@@ -85,12 +86,7 @@ public class CharacterService {
         RPGCharacter<? extends LivingEntity> npc = npcs.get(living.getUniqueId());
 
         if (npc == null) {
-//            if (living instanceof ArmorEquipable) {
-//                nc = new ArmorEquipableCharacter(living, attributes);
-//            } else {
-//                nc = new SimpleCharacter(living, attributes);
-//            }
-
+            npc = new BaseCharacter(living, attributes);
             npcs.put(living.getUniqueId(), npc);
         }
 

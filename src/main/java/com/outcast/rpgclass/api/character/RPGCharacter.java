@@ -11,6 +11,7 @@ import java.util.Optional;
 // Represents an entity that can have attributes
 // @param <T> type of Entity
 //===========================================================================================================
+
 public interface RPGCharacter<T extends LivingEntity> extends Identifiable {
 
     Optional<T> getLivingEntity();

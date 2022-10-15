@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 // A graph implementation which can only be written to and then read.
 // Does not include logic for removing nodes.
 //===========================================================================================================
+
 public class Graph<T> {
 
     public enum LinkType {

@@ -8,6 +8,7 @@ import org.bukkit.entity.LivingEntity;
 //
 // Doesn't currently work because raycasting doesn't work
 //===========================================================================================================
+
 public abstract class TargetedSkill extends Skill implements TargetedCastable {
 
     public static final String MAX_RANGE_PROPERTY = "max-range";

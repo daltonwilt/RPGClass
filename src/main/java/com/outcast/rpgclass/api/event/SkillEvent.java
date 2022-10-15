@@ -8,6 +8,7 @@ import org.bukkit.event.HandlerList;
 //===========================================================================================================
 // Event that will trigger for when a character gains or loses a skill
 //===========================================================================================================
+
 public class SkillEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();

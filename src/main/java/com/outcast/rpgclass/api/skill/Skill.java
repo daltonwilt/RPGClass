@@ -13,6 +13,7 @@ import java.util.Objects;
 //===========================================================================================================
 // Abstract skill that implements castable to use the cast functionality of RPGSkills and stores skill data
 //===========================================================================================================
+
 public abstract class Skill implements Castable {
 
     private String id;
@@ -38,6 +39,7 @@ public abstract class Skill implements Castable {
     //===========================================================================================================
     // Utility methods for evaluating an expression inside given string
     //===========================================================================================================
+
     protected static Expression asExpression(String expression) {
         return RPGClass.getInstance().getExpressionService().getExpression(expression);
     }
@@ -61,6 +63,7 @@ public abstract class Skill implements Castable {
     //===========================================================================================================
     // Getters/Setters for skill data
     //===========================================================================================================
+
     @Override
     public String getId() {
         return id;
@@ -110,6 +113,7 @@ public abstract class Skill implements Castable {
     //===========================================================================================================
     // Holds different types of data E.X.( DAMAGE, RANGE, ETC..)
     //===========================================================================================================
+
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String propertyKey, Class<T> asClass, T defaultValue) {
         if (String.class.equals(asClass)) {

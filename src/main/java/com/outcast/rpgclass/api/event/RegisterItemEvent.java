@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 //===========================================================================================================
 // Finish implementation whenever attributes have been developed.
 //===========================================================================================================
+
 public class RegisterItemEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();

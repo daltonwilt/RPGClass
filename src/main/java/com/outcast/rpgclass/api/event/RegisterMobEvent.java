@@ -8,6 +8,7 @@ import org.bukkit.event.HandlerList;
 //===========================================================================================================
 // Event for registering mobs data for in game experience
 //===========================================================================================================
+
 public class RegisterMobEvent extends Event {
 
     private static final HandlerList handlers = new HandlerList();

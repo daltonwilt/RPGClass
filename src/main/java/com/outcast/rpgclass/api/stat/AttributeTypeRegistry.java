@@ -12,6 +12,7 @@ import java.util.Optional;
 // Class that stores those different attribute types in a map so they can be later retrieved for
 // manipulation or calculation
 //===========================================================================================================
+
 public class AttributeTypeRegistry {
 
     private Map<String, AttributeType> attributeTypeMap = new LinkedHashMap<>();
