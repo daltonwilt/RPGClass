@@ -3,6 +3,10 @@ package com.outcast.rpgclass.character;
 import com.outcast.rpgclass.api.character.RPGCharacter;
 import com.outcast.rpgclass.api.skill.Skill;
 import com.outcast.rpgclass.api.stat.AttributeType;
+import com.outcast.rpgclass.repositroy.AttributeTypeConverter;
+import com.outcast.rpgclass.repositroy.RoleConverter;
+import com.outcast.rpgclass.repositroy.SkillConverter;
+import jakarta.persistence.*;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
@@ -14,10 +18,17 @@ import java.util.*;
 // Store data in mongodb documents
 //===========================================================================================================
 
+@Entity
+@Table(schema = "rpgclass", name = "Character")
 public class Character implements RPGCharacter<Player> {
 
+    @Id
     private UUID id;
+
+    @Transient
     private Player player;
+
+    @Transient
     private boolean hasJoined;
 
     /**
@@ -26,11 +37,17 @@ public class Character implements RPGCharacter<Player> {
      * Only Upgradable Attributes should be stored within this map
      */
 
+    @Convert(attributeName = "key.", converter = AttributeTypeConverter.class)
+    @ElementCollection(fetch = FetchType.EAGER)
+    @MapKeyColumn(name = "attribute_type")
+    @Column(name = "value")
+    @CollectionTable(schema = "rpgclass", name = "Character_attributes")
     private Map<AttributeType, Double> characterAttributes = new HashMap<>();
 
     /**
      * Attributes that come from temporary sources
      */
+    @Transient
     private Map<AttributeType, Double> externalAttributes = new HashMap<>();
 
     private int level;
@@ -43,7 +60,12 @@ public class Character implements RPGCharacter<Player> {
     /**
      * List of skills acquired by player
      */
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(schema = "rpgclass", name = "Character_skills")
+    @Convert(converter = SkillConverter.class)
     private List<Skill> skills = new ArrayList<>();
+
+    @Convert(converter = RoleConverter.class)
     private Role role = Role.adventurer;
 
     public Character() {}
@@ -101,7 +123,7 @@ public class Character implements RPGCharacter<Player> {
         externalAttributes.forEach((type , value) -> externalAttributes.merge(type, value, Double::sum));
     }
 
-    public double getLevel() {
+    public int getLevel() {
         return level;
     }
 

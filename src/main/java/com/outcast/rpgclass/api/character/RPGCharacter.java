@@ -6,13 +6,14 @@ import org.bukkit.entity.LivingEntity;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 //===========================================================================================================
 // Represents an entity that can have attributes
 // @param <T> type of Entity
 //===========================================================================================================
 
-public interface RPGCharacter<T extends LivingEntity> extends Identifiable {
+public interface RPGCharacter<T extends LivingEntity> extends Identifiable<UUID> {
 
     Optional<T> getLivingEntity();
 

@@ -27,7 +27,7 @@ public class TemporaryAttributesEffect extends TemporaryEffect {
     protected boolean apply(ApplyableCarrier<?> character) {
         character.getLivingEntity().ifPresent(living -> {
             RPGCharacter<?> rpgCharacter = RPGClass.getInstance().getCharacterService().getOrCreateCharacter(living);
-            RPGClass.getInstance().getAttributeFacade().mergeBuffAttributes(rpgCharacter, attributeIncreases);
+            RPGClass.getInstance().getAttributeFacade().mergeExternalAttributes(rpgCharacter, attributeIncreases);
             Bukkit.getPluginManager().callEvent(new ChangeAttributeEvent(rpgCharacter));
         });
 
@@ -38,7 +38,7 @@ public class TemporaryAttributesEffect extends TemporaryEffect {
     protected boolean remove(ApplyableCarrier<?> character) {
         character.getLivingEntity().ifPresent(living -> {
             RPGCharacter<?> rpgCharacter = RPGClass.getInstance().getCharacterService().getOrCreateCharacter(living);
-            RPGClass.getInstance().getAttributeFacade().mergeBuffAttributes(rpgCharacter, attributeDecreases);
+            RPGClass.getInstance().getAttributeFacade().mergeExternalAttributes(rpgCharacter, attributeDecreases);
             Bukkit.getPluginManager().callEvent(new ChangeAttributeEvent(rpgCharacter));
         });
 

@@ -26,7 +26,7 @@ public class RPGClassModule extends AbstractModule {
         bind(MobsConfig.class).in(Scopes.SINGLETON);
 
         // Repository
-        bind(CharacterRepository.class).in(Scopes.SINGLETON);
+//        bind(CharacterRepository.class).in(Scopes.SINGLETON);
 
         // Services
         bind(ExpressionService.class).in(Scopes.SINGLETON);

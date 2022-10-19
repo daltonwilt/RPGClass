@@ -65,22 +65,20 @@ public class CharacterService {
     }
 
     public Character getOrCreateCharacter(Player player) {
-//        return repository.findById(player.getUniqueId()).orElseGet(() -> {
-//            Character character = new Character(player.getUniqueId());
-//            character.setEntity(player);
-//            character.addSkill(skillGraphService.getSkillGraphRoot());
-//            character.setExperience(config.EXPERIENCE_START);
-//            repository.saveOne(c);
-//
-//            return c;
-//        });
+        return repository.findById(player.getUniqueId()).orElseGet(() -> {
+            Character character = new Character(player.getUniqueId());
+            character.setLivingEntity(player);
+            character.addSkill(skillGraphService.getSkillGraphRoot());
+            character.setExperience(config.EXPERIENCE_START);
+            repository.mergeOne(character);
 
-        return null;
+            return character;
+        });
     }
 
     public RPGCharacter<? extends LivingEntity> getOrCreateCharacter(LivingEntity living, Map<AttributeType, Double> attributes) {
         if (living instanceof Player) {
-            getOrCreateCharacter((Player) living);
+            return getOrCreateCharacter((Player) living);
         }
 
         RPGCharacter<? extends LivingEntity> npc = npcs.get(living.getUniqueId());
@@ -110,19 +108,19 @@ public class CharacterService {
         character.getSkills().addAll(skills);
 
         setSkillPermissions(character, skills, true);
-//        repository.saveOne(c);
+        repository.mergeOne(character);
     }
 
     public void addSkill(Character character, Skill skill) {
         character.addSkill(skill);
         setSkillPermission(character, skill, true);
-//        repository.saveOne(c);
+        repository.mergeOne(character);
     }
 
     public void removeSkill(Character character, Skill skill) {
         character.removeSkill(skill);
         setSkillPermission(character, skill, false);
-//        repository.saveOne(character);
+        repository.mergeOne(character);
     }
 
     private void setSkillPermission(Character character, Castable skill, boolean value) {
@@ -145,16 +143,34 @@ public class CharacterService {
         return character.getLivingEntity();
     }
 
-    // Add level & experience method additions
+    public void addLevel(Character character, int amount) {
+        character.setLevel(character.getLevel() + amount);
+        repository.mergeOne(character);
+    }
+
+    public void removeLevel(Character character, int amount) {
+        character.setLevel(character.getLevel() - amount);
+        repository.mergeOne(character);
+    }
+
+    public void addExperience(Character character, double amount) {
+        character.setExperience(character.getExperience() + amount);
+        repository.mergeOne(character);
+    }
+
+    public void removeExperience(Character character, double amount) {
+        character.setExperience(character.getExperience() - amount);
+        repository.mergeOne(character);
+    }
 
     public void addUpgradeExperience(Character character, double amount) {
         character.setUpgradeExperience(character.getUpgradeExperience() + amount);
-//        repository.saveOne(c);
+        repository.mergeOne(character);
     }
 
     public void removeUpgradeExperience(Character character, double amount) {
         character.setUpgradeExperience(character.getUpgradeExperience() - amount);
-//        repository.saveOne(c);
+        repository.mergeOne(character);
     }
 
     /**
@@ -165,7 +181,7 @@ public class CharacterService {
      */
     public void addAttribute(Character character, AttributeType attributeType, double amount) {
         character.addCharacterAttribute(attributeType, amount);
-//        repository.saveOne(c);
+        repository.mergeOne(character);
 
         // call event
         Bukkit.getPluginManager().callEvent(new ChangeAttributeEvent(character));
@@ -179,7 +195,7 @@ public class CharacterService {
      */
     public void setAttribute(Character character, AttributeType attributeType, double amount) {
         character.setCharacterAttribute(attributeType, amount);
-//        repository.saveOne(c);
+        repository.mergeOne(character);
 
         // call event
         Bukkit.getPluginManager().callEvent(new ChangeAttributeEvent(character));
@@ -194,31 +210,31 @@ public class CharacterService {
     public void removeAttribute(Character character, AttributeType attributeType, double amount) {
         Double cur = character.getCharacterAttributes().getOrDefault(attributeType, 0.0d);
         character.setCharacterAttribute(attributeType, Math.max(0.0d, cur - amount));
-//        repository.saveOne(character);
+        repository.mergeOne(character);
 
         // call event
         Bukkit.getPluginManager().callEvent(new ChangeAttributeEvent(character));
     }
 
-    public void mergeBuffAttributes(RPGCharacter<?> character, Map<AttributeType, Double> attributes) {
+    public void mergeExternalAttributes(RPGCharacter<?> character, Map<AttributeType, Double> attributes) {
         character.mergeExternalAttributes(attributes);
     }
 
     public void addSpentUpgradeExperience(Character character, double amount) {
         character.setSpentUpgradeExperience(character.getSpentUpgradeExperience() + amount);
-//        repository.saveOne(character);
+        repository.mergeOne(character);
     }
 
     public void addSpentSkillUpgradeExperience(Character character, double amount) {
         character.setSpentUpgradeExperience(character.getSpentUpgradeExperience() + amount);
         character.setSpentSkillUpgradeExperience(character.getSpentSkillUpgradeExperience() + amount);
-//        repository.saveOne(character);
+        repository.mergeOne(character);
     }
 
     public void addSpentAttributeUpgradeExperience(Character character, double amount) {
         character.setSpentUpgradeExperience(character.getSpentUpgradeExperience() + amount);
         character.setSpentAttributeUpgradeExperience(character.getSpentAttributeUpgradeExperience() + amount);
-//        repository.saveOne(character);
+        repository.mergeOne(character);
 
         // call event
         Bukkit.getPluginManager().callEvent(new ChangeAttributeEvent(character));
@@ -238,7 +254,7 @@ public class CharacterService {
         character.setSpentSkillUpgradeExperience(0);
         character.setSpentUpgradeExperience(character.getSpentUpgradeExperience() - spentOnSkills);
         character.setUpgradeExperience(character.getUpgradeExperience() + spentOnSkills);
-//        repository.saveOne(c);
+        repository.mergeOne(character);
     }
 
     public void resetCharacterAttributes(Character character) {
@@ -248,7 +264,7 @@ public class CharacterService {
         character.setSpentAttributeUpgradeExperience(0);
         character.setSpentUpgradeExperience(character.getSpentUpgradeExperience() - spentOnAttributes);
         character.setUpgradeExperience(character.getUpgradeExperience() + spentOnAttributes);
-//        repository.saveOne(character);
+        repository.mergeOne(character);
 
         // call event
         Bukkit.getPluginManager().callEvent(new ChangeAttributeEvent(character));

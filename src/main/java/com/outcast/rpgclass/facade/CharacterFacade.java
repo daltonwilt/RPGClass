@@ -1,9 +1,11 @@
 package com.outcast.rpgclass.facade;
 
+import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.outcast.rpgclass.api.event.SkillEvent;
 import com.outcast.rpgclass.api.skill.Skill;
+import com.outcast.rpgclass.api.stat.AttributeType;
 import com.outcast.rpgclass.character.Character;
 import com.outcast.rpgclass.character.Role;
 import com.outcast.rpgclass.command.exception.RPGCommandException;
@@ -20,8 +22,10 @@ import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -30,10 +34,21 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.tags.CustomItemTagContainer;
+import org.bukkit.material.MaterialData;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.outcast.rpgcore.util.InventoryUtil.getMainHand;
 
 //===========================================================================================================
 // Facade class that usable methods by entities for skills and their characters
@@ -299,24 +314,24 @@ public class CharacterFacade {
         event.setRegenAmount(amount);
     }
 
-    public void onDamage(EntityDamageEvent event, DamageCause cause, LivingEntity target) {
+    public void onDamage(EntityDamageEvent event, LivingEntity target) {
         // Do I need to add indirect damage or just account for that in the else
-        if(config.ENVIRONMENTAL_CALCULATIONS.containsKey(cause)) {
+        if(config.ENVIRONMENTAL_CALCULATIONS.containsKey(event.getCause())) {
             // on environment damage
-            onEnvironmentalDamage(event, cause, target);
+            onEnvironmentalDamage(event, target);
         } else {
-            onDirectDamage((EntityDamageByEntityEvent) event, cause);
+            onDirectDamage((EntityDamageByEntityEvent) event);
         }
     }
 
-    public void onEnvironmentalDamage(EntityDamageEvent event, DamageCause type, LivingEntity target) {
+    public void onEnvironmentalDamage(EntityDamageEvent event, LivingEntity target) {
         //Remove damage modifiers
         resetDamageEvent(event);
 
         double damage;
 
-        if (type == DamageCause.FALL) {
-            Expression expression = expressionService.getExpression(config.ENVIRONMENTAL_CALCULATIONS.get(type));
+        if (event.getCause() == DamageCause.FALL) {
+            Expression expression = expressionService.getExpression(config.ENVIRONMENTAL_CALCULATIONS.get(event.getCause()));
             // grab fall distance
 //            float blocksFallen = event.getEntity().get(Keys.FALL_DISTANCE).get();
             float blocksFallen = 0;
@@ -324,35 +339,54 @@ public class CharacterFacade {
             expression.setVariable("DISTANCE", BigDecimal.valueOf(blocksFallen));
             damage = expressionService.evalExpression(target, expression).doubleValue();
         } else {
-            damage = expressionService.evalExpression(target, config.ENVIRONMENTAL_CALCULATIONS.get(type)).doubleValue();
+            damage = expressionService.evalExpression(target, config.ENVIRONMENTAL_CALCULATIONS.get(event.getCause())).doubleValue();
         }
 
         event.setDamage(damage);
     }
 
-    public void onDirectDamage(EntityDamageByEntityEvent event, DamageCause cause) {
+    public void onDirectDamage(EntityDamageByEntityEvent event) {
         Entity source = event.getDamager();
         Entity target = event.getEntity();
 
-        Material weapon = Material.AIR;
-        // get
+        ItemStack weapon = getMainHand(source).orElse(null);
+
+        // Remove all damage modifiers
+        resetDamageEvent(event);
 
 //        Optional<DamageExpressionData> damageExpressionData = cause.get
 
         // If damage source is VOID, skip damage calculations this is true damage
-        if(cause == DamageCause.VOID) {
+        if(event.getCause() == DamageCause.VOID) {
             return;
         }
 
-        if(cause == DamageCause.MAGIC) {
-
+        // If the damage source type is MAGIC, we do magic mitigation
+        if(event.getCause() == DamageCause.MAGIC) {
+            Map<AttributeType, Double> targetAttributes = attributeFacade.getAllAttributes(target);
+            event.setDamage(Math.max(damageService.getMagicalDamageMitigation(targetAttributes, event.getDamage()), 0.0f));
+            return;
         }
 
+        // If the damage source type is CUSTOM, we do physical mitigation
+        if (event.getCause() == DamageCause.CUSTOM) {
+            Map<AttributeType, Double> targetAttributes = attributeFacade.getAllAttributes(target);
 
+            event.setDamage(Math.max(damageService.getPhysicalDamageMitigation(targetAttributes, event.getDamage()), 0.0f));
+            return;
+        }
+
+        // Otherwise, treat as basic attack
+        Map<AttributeType, Double> attackerAttributes = attributeFacade.getAllAttributes(source);
+        Map<AttributeType, Double> targetAttributes = attributeFacade.getAllAttributes(target);
+
+        event.setDamage(Math.max(damageService.getMeleeDamage(attackerAttributes, targetAttributes, weapon.getType()), 0.0d));
     }
 
+    // Do I need to add indirect damage ?
+
     private void resetDamageEvent(EntityDamageEvent event) {
-//        event.get
+        // override modifiers and set them to 0
     }
 
     public void onPlayerJoin(Player player) {

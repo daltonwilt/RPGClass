@@ -13,11 +13,15 @@ import com.outcast.rpgclass.service.CharacterService;
 import com.udojava.evalex.Expression;
 import net.kyori.adventure.audience.Audience;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import javax.inject.Singleton;
 import java.math.BigDecimal;
 import java.util.Map;
+
+import static com.outcast.rpgcore.util.InventoryUtil.getMainHand;
 
 //===========================================================================================================
 // Implement this system after mob integration is finished.
@@ -56,8 +60,9 @@ public class AttributeFacade {
     public void addPlayerAttribute(Player player, AttributeType attributeType, double amount) throws RPGCommandException {
         Character character = characterService.getOrCreateCharacter(player);
 
-        // Check if character has valid attributes
-        // add attribute from character
+        if (validateCharacterAttribute(attributeType, character.getCharacterAttributes().getOrDefault(attributeType, config.ATTRIBUTE_MIN) + amount)) {
+            characterService.addAttribute(character, attributeType, amount);
+        }
     }
 
     /**
@@ -70,8 +75,9 @@ public class AttributeFacade {
     public void removePlayerAttribute(Player player, AttributeType attributeType, double amount) throws RPGCommandException {
         Character character = characterService.getOrCreateCharacter(player);
 
-        // Check if character has valid attributes
-        // remove attribute from character
+        if (validateCharacterAttribute(attributeType, character.getCharacterAttributes().getOrDefault(attributeType, config.ATTRIBUTE_MIN) - amount)) {
+            characterService.removeAttribute(character, attributeType, amount);
+        }
     }
 
     /**
@@ -96,8 +102,8 @@ public class AttributeFacade {
         return true;
     }
 
-    public void mergeBuffAttributes(RPGCharacter<?> rpgc, Map<AttributeType, Double> attributes) {
-        characterService.mergeBuffAttributes(rpgc, attributes);
+    public void mergeExternalAttributes(RPGCharacter<?> rpgc, Map<AttributeType, Double> attributes) {
+        characterService.mergeExternalAttributes(rpgc, attributes);
     }
 
     /**
@@ -120,8 +126,15 @@ public class AttributeFacade {
         if(character.getSpentUpgradeExperience() + cost > config.EXPERIENCE_SPENDING_LIMIT) {
             throw new RPGCommandException("You cannot go over the experience spending limit of ", config.EXPERIENCE_SPENDING_LIMIT, ".");
         } else {
+            // base case error checks
             if(character.getUpgradeExperience() - cost > config.EXPERIENCE_MIN) {
                 throw new RPGCommandException("You cannot go over the attribute spending limit of ", config.ATTRIBUTE_SPENDING_LIMIT, ".");
+            }
+
+            if (character.getSpentAttributeUpgradeExperience() + cost > config.ATTRIBUTE_SPENDING_LIMIT) {
+                throw new RPGCommandException(
+                        "You cannot go over the attribute spending limit of ", config.ATTRIBUTE_SPENDING_LIMIT, "."
+                );
             }
 
             double afterPurchase = character.getCharacterAttributes().getOrDefault(type, config.ATTRIBUTE_MIN);
@@ -157,6 +170,26 @@ public class AttributeFacade {
         }
 
         return cost;
+    }
+
+    public void resetPlayerAttributes(Player player) {
+        characterService.resetCharacterAttributes(characterService.getOrCreateCharacter(player));
+        rpgMsg.info((Audience)player, "Your attributes have been reset.");
+    }
+
+    public void enchantPlayerHeldItem(Player player, AttributeType attributeTyp, Double amount) throws RPGCommandException {
+        ItemStack item = getMainHand(player).orElse(null);
+
+        if (item == null) {
+            throw new RPGCommandException("You must be holding an item in order to enchant it with an attribute.");
+        }
+
+//        setItemAttributeValue(item, attributeType, amount);
+//        updateItemLore(item);
+    }
+
+    public Map<AttributeType, Double> getAllAttributes(Entity entity) {
+        return attributeService.getAllAttributes(entity);
     }
 
 }

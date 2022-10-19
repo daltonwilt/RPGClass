@@ -243,7 +243,8 @@ public final class RPGClass extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // flush character repository
+        // flush character repository]
+        getCharacterRepository().flush();
         RPGCore.info(instance, "RPGClass v%s is being disabled.", getDescription().getVersion());
     }
 
