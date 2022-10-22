@@ -4,6 +4,7 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.outcast.rpgclass.command.CommandClass;
+import com.outcast.rpgclass.command.exception.RPGCommandException;
 import com.outcast.rpgclass.config.RPGClassConfig;
 import com.outcast.rpgclass.config.RPGCombatConfig;
 import com.outcast.rpgclass.config.archetype.ArchetypesConfig;
@@ -18,10 +19,14 @@ import com.outcast.rpgclass.repositroy.CharacterRepository;
 import com.outcast.rpgclass.service.*;
 import com.outcast.rpgcore.RPGCore;
 import com.outcast.rpgcore.command.CommandService;
+import com.outcast.rpgcore.storage.event.RepositoryConfigurationEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public final class RPGClass extends JavaPlugin {
+public final class RPGClass extends JavaPlugin implements Listener {
 
     private static RPGClass instance;
     private static Components components;
@@ -198,6 +203,15 @@ public final class RPGClass extends JavaPlugin {
     }
 
     //===========================================================================================================
+    // Listeners for database events
+    //===========================================================================================================
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onRepositoryConfiguration(RepositoryConfigurationEvent event) {
+        event.registerEntity(Character.class);
+    }
+
+    //===========================================================================================================
     // onEnable onDisable methods.
     //===========================================================================================================
 
@@ -207,16 +221,12 @@ public final class RPGClass extends JavaPlugin {
 
         printDivider();
         printBlank();
-        RPGCore.info(instance, "  RPGClass v%s", getDescription().getVersion());
-        RPGCore.info(instance, "  You're running on %s.", getServer().getVersion());
+        RPGCore.info(this, "  RPGClass v%s", getDescription().getVersion());
+        RPGCore.info(this, "  You're running on %s.", getServer().getVersion());
         printDivider();
 
-        // Register command manager
-        try {
-            CommandService.createCommand(this, "class", "Command prefix for RPGClass.", "/class", CommandClass.class);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        RPGCore.info(this, "RPGCore instance : %s", RPGCore.getInstance());
+        RPGCore.info(this, "RPGCore databaseService : %s", RPGCore.getDatabaseService());
 
         // Inject Modules
         components = new Components();
@@ -235,10 +245,30 @@ public final class RPGClass extends JavaPlugin {
         // Initialize Services
         getCharacterService().init();
         getExpressionService().init();
+        components.healingService.init();
+        getMobService().init();
+
+        // Initialize Repository
+        getCharacterRepository().init();
 
         // Register Listeners
         Bukkit.getPluginManager().registerEvents(components.entityListener, this);
         Bukkit.getPluginManager().registerEvents(components.skillsListener, this);
+        Bukkit.getPluginManager().registerEvents(this, this);
+
+        // Register command manager
+        try {
+            CommandService.createCommand(this, "class", "Command prefix for RPGClass.", "/class", CommandClass.class);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            getSkillGraphService().resetSkillGraph();
+        } catch (RPGCommandException e) {
+                e.printStackTrace();
+        }
+
     }
 
     @Override

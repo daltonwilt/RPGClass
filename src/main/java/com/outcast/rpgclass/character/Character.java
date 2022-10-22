@@ -6,16 +6,16 @@ import com.outcast.rpgclass.api.stat.AttributeType;
 import com.outcast.rpgclass.repositroy.AttributeTypeConverter;
 import com.outcast.rpgclass.repositroy.RoleConverter;
 import com.outcast.rpgclass.repositroy.SkillConverter;
-import jakarta.persistence.*;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nonnull;
+import javax.persistence.*;
 import java.util.*;
 
 //===========================================================================================================
 // Class that stores data for a player with Getters/Setters to manipulate or use data in other resources
 //
-// Store data in mongodb documents
+// Store data in sql using jpa/hibernate
 //===========================================================================================================
 
 @Entity

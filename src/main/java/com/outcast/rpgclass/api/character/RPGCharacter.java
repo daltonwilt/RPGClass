@@ -1,7 +1,7 @@
 package com.outcast.rpgclass.api.character;
 
 import com.outcast.rpgclass.api.stat.AttributeType;
-import com.outcast.rpgcore.db.Identifiable;
+import com.outcast.rpgcore.storage.Identifiable;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.Map;

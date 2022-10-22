@@ -2,7 +2,7 @@ package com.outcast.rpgclass.repositroy;
 
 import com.google.inject.Singleton;
 import com.outcast.rpgclass.character.Character;
-import com.outcast.rpgcore.db.CachedRepository;
+import com.outcast.rpgcore.storage.repository.CachedRepository;
 
 import java.util.UUID;
 
